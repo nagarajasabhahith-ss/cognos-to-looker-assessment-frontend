@@ -251,13 +251,13 @@ export function AssessmentReportPdf({ data }: AssessmentReportPdfProps) {
                     const items = complex_analysis?.[key];
                     if (!Array.isArray(items) || items.length === 0) return null;
                     const headers = [{ label: "FEATURE AREA", flex: 1 }, { label: "COMPLEXITY", flex: 0.8 }, { label: "FEATURE", flex: 1 }, ...columns.map((c) => ({ label: c.header, flex: 0.8 as number }))];
-                    const rows: (string | number)[][] = (items as unknown as Array<Record<string, unknown>>).map((item) => {
+                    const rows = (items as unknown as Array<Record<string, unknown>>).map((item): (string | number)[] => {
                         const complexity = String(item.complexity ?? "").charAt(0).toUpperCase() + String(item.complexity ?? "").slice(1).toLowerCase();
                         return [
                             featureAreaLabel,
                             complexity,
                             String(item.feature ?? "—"),
-                            ...columns.map((c) => (typeof item[c.key] === "number" ? item[c.key] : String(item[c.key] ?? "—"))),
+                            ...columns.map((c): string | number => (typeof item[c.key] === "number" ? (item[c.key] as number) : String(item[c.key] ?? "—"))),
                         ];
                     });
                     return (

@@ -33,47 +33,47 @@ export function ObjectDetailsPanel({ object, open, onOpenChange }: ObjectDetails
                 </SheetHeader>
 
                 <div className="mt-6 space-y-6">
-                    {object.properties?.expression && (
+                    {Boolean(object.properties?.expression) && (
                         <div>
                             <h4 className="text-sm font-medium mb-2 text-muted-foreground">Expression</h4>
                             <ScrollArea className="max-h-[200px] bg-muted p-3 rounded-md border">
                                 <code className="text-xs font-mono whitespace-pre-wrap break-all text-primary">
-                                    {object.properties.expression}
+                                    {String(object.properties?.expression ?? "")}
                                 </code>
                             </ScrollArea>
                         </div>
                     )}
 
                     <div className="grid grid-cols-2 gap-4">
-                        {object.properties?.data_type && (
+                        {Boolean(object.properties?.data_type) && (
                             <div>
                                 <h4 className="text-sm font-medium mb-1 text-muted-foreground">Data Type</h4>
                                 <Badge variant="secondary" className="font-mono text-xs">
-                                    {object.properties.data_type}
+                                    {String(object.properties?.data_type ?? "")}
                                 </Badge>
                             </div>
                         )}
-                        {object.properties?.aggregate && (
+                        {Boolean(object.properties?.aggregate) && (
                             <div>
                                 <h4 className="text-sm font-medium mb-1 text-muted-foreground">Aggregation</h4>
                                 <Badge variant="secondary" className="font-mono text-xs">
-                                    {object.properties.aggregate}
+                                    {String(object.properties?.aggregate ?? "")}
                                 </Badge>
                             </div>
                         )}
-                        {object.properties?.calculation_type && (
+                        {Boolean(object.properties?.calculation_type) && (
                             <div>
                                 <h4 className="text-sm font-medium mb-1 text-muted-foreground">Calculation Type</h4>
                                 <Badge variant="outline" className="text-xs">
-                                    {object.properties.calculation_type}
+                                    {String(object.properties?.calculation_type ?? "")}
                                 </Badge>
                             </div>
                         )}
-                        {object.properties?.data_usage && (
+                        {Boolean(object.properties?.data_usage) && (
                             <div>
                                 <h4 className="text-sm font-medium mb-1 text-muted-foreground">Usage</h4>
-                                <Badge className={object.properties.data_usage === 'measure' ? "bg-blue-100 text-blue-800 hover:bg-blue-100" : "bg-gray-100 text-gray-800 hover:bg-gray-100"}>
-                                    {object.properties.data_usage}
+                                <Badge className={String(object.properties?.data_usage) === 'measure' ? "bg-blue-100 text-blue-800 hover:bg-blue-100" : "bg-gray-100 text-gray-800 hover:bg-gray-100"}>
+                                    {String(object.properties?.data_usage ?? "")}
                                 </Badge>
                             </div>
                         )}
