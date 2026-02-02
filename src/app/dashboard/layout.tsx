@@ -27,6 +27,8 @@ export default function DashboardLayout({
             {
                 "--sidebar-width": "calc(var(--spacing) * 72)",
                 "--header-height": "calc(var(--spacing) * 12)",
+                "--color-sidebar": "var(--light-cream)",
+                backgroundColor: "var(--light-cream)",
             } as React.CSSProperties
         }>
             <AppSidebar variant="inset" />

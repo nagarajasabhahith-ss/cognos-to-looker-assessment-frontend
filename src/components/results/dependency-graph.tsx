@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
     ReactFlow,
     MiniMap,
@@ -17,6 +17,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { ExtractedObject, ObjectRelationship } from "@/lib/api";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import dagre from "dagre";
 
 interface DependencyGraphProps {
@@ -39,6 +41,8 @@ const typeColors: Record<string, string> = {
     filter: "#06b6d4",
     default: "#6b7280",
 };
+
+const PRIMARY_TYPES = new Set(['report', 'dashboard', 'data_module', 'package', 'folder']);
 
 const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = "TB") => {
     const dagreGraph = new dagre.graphlib.Graph();
@@ -72,8 +76,23 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[], direction = "TB") => 
 };
 
 export function DependencyGraph({ objects, relationships, onNodeClick }: DependencyGraphProps) {
+    const [showPrimaryOnly, setShowPrimaryOnly] = useState(false);
+
+    const filteredObjects = useMemo(() => {
+        if (!showPrimaryOnly) return objects;
+        return objects.filter(o => PRIMARY_TYPES.has(o.object_type));
+    }, [objects, showPrimaryOnly]);
+
+    const filteredRelationships = useMemo(() => {
+        if (!showPrimaryOnly) return relationships;
+        const objectIds = new Set(filteredObjects.map(o => o.id));
+        return relationships.filter(r =>
+            objectIds.has(r.source_object_id) && objectIds.has(r.target_object_id)
+        );
+    }, [relationships, filteredObjects, showPrimaryOnly]);
+
     const initialNodes: Node[] = useMemo(() => {
-        return objects.map((obj) => ({
+        return filteredObjects.map((obj) => ({
             id: obj.id,
             data: {
                 label: obj.name,
@@ -92,10 +111,10 @@ export function DependencyGraph({ objects, relationships, onNodeClick }: Depende
                 textAlign: "center" as const,
             },
         }));
-    }, [objects]);
+    }, [filteredObjects]);
 
     const initialEdges: Edge[] = useMemo(() => {
-        return relationships.map((rel) => ({
+        return filteredRelationships.map((rel) => ({
             id: rel.id,
             source: rel.source_object_id,
             target: rel.target_object_id,
@@ -110,7 +129,7 @@ export function DependencyGraph({ objects, relationships, onNodeClick }: Depende
             labelStyle: { fontSize: 10, fill: "#64748b" },
             labelBgStyle: { fill: "white", fillOpacity: 0.8 },
         }));
-    }, [relationships]);
+    }, [filteredRelationships]);
 
     // Apply layout
     const { nodes: layoutedNodes, edges: layoutedEdges } = useMemo(() => {
@@ -161,7 +180,7 @@ export function DependencyGraph({ objects, relationships, onNodeClick }: Depende
                     maskColor="rgba(0, 0, 0, 0.1)"
                 />
                 <Background gap={16} size={1} />
-                <Panel position="top-left" className="bg-background/80 p-2 rounded-md text-xs space-y-1">
+                <Panel position="top-left" className="bg-background/80 p-2 rounded-md text-xs space-y-1 shadow-sm border">
                     <div className="font-medium mb-2">Object Types</div>
                     {Object.entries(typeColors).filter(([key]) => key !== "default").map(([type, color]) => (
                         <div key={type} className="flex items-center gap-2">
@@ -172,6 +191,16 @@ export function DependencyGraph({ objects, relationships, onNodeClick }: Depende
                             <span className="capitalize">{type.replace("_", " ")}</span>
                         </div>
                     ))}
+                    <div className="pt-2 mt-2 border-t">
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="show-primary"
+                                checked={showPrimaryOnly}
+                                onCheckedChange={(checked) => setShowPrimaryOnly(!!checked)}
+                            />
+                            <Label htmlFor="show-primary" className="text-xs cursor-pointer font-medium">Primary Assets Only</Label>
+                        </div>
+                    </div>
                 </Panel>
             </ReactFlow>
         </div>

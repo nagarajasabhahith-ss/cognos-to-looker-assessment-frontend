@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -31,65 +31,95 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
+// Export columns for reuse
+export const defaultColumns: ColumnDef<ExtractedObject>[] = [
+    {
+        accessorKey: "name",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Name
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            );
+        },
+        cell: ({ row }) => <div className="font-medium pl-4">{row.getValue("name")}</div>,
+    },
+    {
+        accessorKey: "object_type",
+        header: "Type",
+        cell: ({ row }) => {
+            const type = row.getValue("object_type") as string;
+            const props = row.original.properties || {};
+            const vizType = props.visualization_type as string | undefined;
+
+            return (
+                <div className="flex flex-col">
+                    <span className="capitalize font-medium">{type}</span>
+                    {vizType && (
+                        <span className="text-xs text-muted-foreground">{vizType}</span>
+                    )}
+                </div>
+            );
+        },
+    },
+    {
+        accessorKey: "path",
+        header: "Path",
+        cell: ({ row }) => {
+            const path = row.getValue("path") as string;
+            return <div className="text-muted-foreground text-sm truncate max-w-[300px]" title={path || ""}>{path || "-"}</div>;
+        },
+    },
+    {
+        id: "created_at",
+        accessorKey: "created_at",
+        header: "Extracted At",
+        cell: ({ row }) => {
+            return (
+                <div className="text-sm text-muted-foreground">
+                    {new Date(row.getValue("created_at")).toLocaleString()}
+                </div>
+            );
+        },
+    },
+];
 
 interface ObjectsTableProps {
     data: ExtractedObject[];
     onObjectClick: (object: ExtractedObject) => void;
+    customColumns?: ColumnDef<ExtractedObject>[];
 }
 
-export function ObjectsTable({ data, onObjectClick }: ObjectsTableProps) {
+export function ObjectsTable({ data, onObjectClick, customColumns }: ObjectsTableProps) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = useState({});
+    const [showPrimaryOnly, setShowPrimaryOnly] = useState(false);
 
-    const columns: ColumnDef<ExtractedObject>[] = [
-        {
-            accessorKey: "name",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Name
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                );
-            },
-            cell: ({ row }) => <div className="font-medium pl-4">{row.getValue("name")}</div>,
-        },
-        {
-            accessorKey: "object_type",
-            header: "Type",
-            cell: ({ row }) => (
-                <div className="capitalize">{row.getValue("object_type")}</div>
-            ),
-        },
-        {
-            accessorKey: "path",
-            header: "Path",
-            cell: ({ row }) => {
-                const path = row.getValue("path") as string;
-                return <div className="text-muted-foreground text-sm truncate max-w-[300px]" title={path || ""}>{path || "-"}</div>;
-            },
-        },
-        {
-            id: "created_at",
-            accessorKey: "created_at",
-            header: "Extracted At",
-            cell: ({ row }) => {
-                return (
-                    <div className="text-sm text-muted-foreground">
-                        {new Date(row.getValue("created_at")).toLocaleString()}
-                    </div>
-                );
-            },
-        },
-    ];
+    const PRIMARY_TYPES = useMemo(() => new Set(['report', 'dashboard', 'data_module', 'package', 'folder']), []);
+
+    const filteredData = useMemo(() => {
+        if (!showPrimaryOnly) return data;
+        return data.filter(o => PRIMARY_TYPES.has(o.object_type));
+    }, [data, showPrimaryOnly, PRIMARY_TYPES]);
+
+    const columns = useMemo(() => {
+        if (customColumns) {
+            return [...defaultColumns, ...customColumns];
+        }
+        return defaultColumns;
+    }, [customColumns]);
 
     const table = useReactTable({
-        data,
+        data: filteredData,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -120,6 +150,14 @@ export function ObjectsTable({ data, onObjectClick }: ObjectsTableProps) {
                         }
                         className="pl-8"
                     />
+                </div>
+                <div className="flex items-center space-x-2 ml-4">
+                    <Checkbox
+                        id="table-show-primary"
+                        checked={showPrimaryOnly}
+                        onCheckedChange={(checked) => setShowPrimaryOnly(!!checked)}
+                    />
+                    <Label htmlFor="table-show-primary" className="text-sm cursor-pointer whitespace-nowrap">Primary Assets Only</Label>
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
