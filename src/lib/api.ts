@@ -53,6 +53,7 @@ export enum AssessmentStatus {
 export interface Assessment {
     id: string;
     name: string;
+    description?: string;
     bi_tool: string;
     status: AssessmentStatus;
     user_id: string;

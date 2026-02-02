@@ -3,9 +3,8 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 COPY package*.json ./
-# Cache npm store so repeated builds are faster when only source changes
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci
+# Optional: add --mount=type=cache,target=/root/.npm for faster repeated local builds (requires BuildKit)
+RUN npm ci
 COPY . .
 
 # Production build stage

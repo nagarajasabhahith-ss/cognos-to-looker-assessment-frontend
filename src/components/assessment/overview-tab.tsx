@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { FileUpload } from "@/components/assessment/file-upload";
 import { FileList } from "@/components/assessment/file-list";
-import { Play, Loader2, RefreshCw, CheckCircle, AlertTriangle, Clock } from "lucide-react";
+import { Play, Loader2, RefreshCw, FileText, CheckCircle, AlertTriangle, Clock } from "lucide-react";
 
 interface OverviewTabProps {
     assessment: Assessment;
@@ -18,6 +18,7 @@ interface OverviewTabProps {
     onRunAnalysis: () => void;
     onRefresh: () => void;
     onFileUpdate: () => void;
+    onViewReport?: () => void;
 }
 
 export function OverviewTab({
@@ -28,6 +29,7 @@ export function OverviewTab({
     onRunAnalysis,
     onRefresh,
     onFileUpdate,
+    onViewReport,
 }: OverviewTabProps) {
     const getStatusBadge = (status: AssessmentStatus) => {
         switch (status) {
@@ -38,7 +40,7 @@ export function OverviewTab({
                         Completed
                     </Badge>
                 );
-            case AssessmentStatus.RUNNING:
+            case AssessmentStatus.PROCESSING:
                 return (
                     <Badge variant="default" className="bg-blue-500">
                         <Loader2 className="mr-1 h-3 w-3 animate-spin" />
@@ -90,7 +92,7 @@ export function OverviewTab({
                         <div className="flex items-center gap-4">
                             <Button
                                 onClick={onRunAnalysis}
-                                disabled={isRunning || assessment.status === AssessmentStatus.RUNNING || files.length === 0}
+                                disabled={isRunning || assessment.status === AssessmentStatus.PROCESSING || assessment.status === AssessmentStatus.COMPLETED || files.length === 0}
                                 className="flex items-center gap-2"
                             >
                                 {isRunning ? (
@@ -106,6 +108,15 @@ export function OverviewTab({
                                 )}
                             </Button>
                             
+                            {assessment.status === AssessmentStatus.COMPLETED && onViewReport && (
+                                <Button
+                                    onClick={onViewReport}
+                                    className="flex items-center gap-2"
+                                >
+                                    <FileText className="h-4 w-4" />
+                                    View Assessment Report
+                                </Button>
+                            )}
                             <Button
                                 variant="outline"
                                 onClick={onRefresh}

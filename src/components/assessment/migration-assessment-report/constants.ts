@@ -1,0 +1,22 @@
+// Visualization type → complexity (aligned with inventory-summary.tsx)
+export const visualizationMapping: Record<string, { complexity: string }> = {
+    "area": { complexity: "Low" }, "bar": { complexity: "Low" }, "box plot": { complexity: "High" },
+    "bubble": { complexity: "High" }, "bullet": { complexity: "Critical" }, "conditional formatting column": { complexity: "Critical" },
+    "crosstab": { complexity: "High" }, "data player": { complexity: "Critical" }, "decision tree": { complexity: "Critical" },
+    "driver analysis": { complexity: "Critical" }, "drop-down list": { complexity: "Critical" }, "heatmap": { complexity: "Critical" },
+    "hierarchy bubble": { complexity: "Critical" }, "kpi": { complexity: "Low" }, "legacy map": { complexity: "Critical" },
+    "line": { complexity: "Low" }, "line and column": { complexity: "Low" }, "list": { complexity: "Low" },
+    "map": { complexity: "High" }, "marimekko": { complexity: "Critical" }, "network": { complexity: "Critical" },
+    "packed bubble": { complexity: "Critical" }, "pie": { complexity: "Low" }, "point": { complexity: "High" },
+    "radar": { complexity: "Critical" }, "radial": { complexity: "Critical" }, "scatter": { complexity: "Low" },
+    "spiral": { complexity: "Critical" }, "stacked bar": { complexity: "Low" }, "stacked column": { complexity: "Low" },
+    "summary": { complexity: "Medium" }, "sunburst": { complexity: "Critical" }, "table": { complexity: "Low" },
+    "tornado": { complexity: "High" }, "treemap": { complexity: "Critical" }, "waterfall": { complexity: "Medium" },
+    "word cloud": { complexity: "Medium" }, "custom viz": { complexity: "High" }, "stepped area": { complexity: "High" },
+    "stepped line": { complexity: "High" }, "stacked combination": { complexity: "Medium" }, "smooth line": { complexity: "Medium" },
+    "smooth area": { complexity: "Medium" }, "gantt": { complexity: "Critical" }, "floating bar": { complexity: "Critical" },
+    "floating column": { complexity: "Critical" }, "donut": { complexity: "Medium" }, "clustered column": { complexity: "Low" },
+    "clustered combination": { complexity: "Low" }, "clustered bar": { complexity: "Low" }, "list, crosstab": { complexity: "Low" },
+    "repeater table": { complexity: "Critical" }, "data table": { complexity: "Critical" }, "repeater": { complexity: "Critical" },
+    "singleton": { complexity: "Medium" },
+};

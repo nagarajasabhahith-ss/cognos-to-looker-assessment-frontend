@@ -39,9 +39,12 @@ export function FileList({ files, assessmentId, onUpdate }: FileListProps) {
             case "parsing":
             case "processing":
                 return <Badge variant="default" className="bg-blue-500">Processing</Badge>;
+            case "partial":
+                return <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 dark:text-amber-400">Partial</Badge>;
             case "failed":
             case "error":
                 return <Badge variant="destructive">Failed</Badge>;
+            case "pending":
             default:
                 return <Badge variant="secondary">Pending</Badge>;
         }

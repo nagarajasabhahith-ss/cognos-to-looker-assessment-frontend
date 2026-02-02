@@ -48,6 +48,7 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
     const { report, isLoading: isLoadingReport } = useAssessmentReport(id, hasResults);
 
     const [isRunning, setIsRunning] = useState(false);
+    const [activeTab, setActiveTab] = useState("overview");
 
     const handleRunAnalysis = async () => {
         setIsRunning(true);
@@ -79,7 +80,7 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
 
     return (
         <div className="container mx-auto py-8">
-            <Tabs defaultValue="overview" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
                 <TabsList>
                     <TabsTrigger value="overview">Overview & Files</TabsTrigger>
                     <TabsTrigger value="migration-report" disabled={!hasResults}>
@@ -105,6 +106,7 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
                         onRunAnalysis={handleRunAnalysis}
                         onRefresh={refresh}
                         onFileUpdate={refresh}
+                        onViewReport={() => setActiveTab("migration-report")}
                     />
                 </TabsContent>
 
@@ -177,18 +179,42 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
 
                 <TabsContent value="migration-report">
                     {hasResults && (
-                            <MigrationAssessmentReport 
-                            objects={objects} 
-                            relationships={relationships}
-                            complex_analysis={report?.complex_analysis ?? null}
-                            summary={report?.summary ?? null}
-                            challenges={report?.challenges ?? null}
-                            appendix={report?.appendix ?? null}
-                            usage_stats={report?.usage_stats ?? null}
-                            assessmentName={assessment.name}
-                            biTool={assessment.bi_tool}
-                            createdAt={assessment.created_at}
-                        />
+                        isLoadingReport || isLoadingObjects ? (
+                            <div className="w-full space-y-6">
+                                <div className="flex flex-col gap-2">
+                                    <Skeleton className="h-8 w-48" />
+                                    <Skeleton className="h-5 w-64" />
+                                </div>
+                                <div className="bg-[#f5f5dc] rounded-b-lg p-6 space-y-6">
+                                    <div className="flex gap-2 border-b border-gray-300 pb-2">
+                                        <Skeleton className="h-12 flex-1 rounded-none" />
+                                        <Skeleton className="h-12 flex-1 rounded-none" />
+                                        <Skeleton className="h-12 flex-1 rounded-none" />
+                                        <Skeleton className="h-12 flex-1 rounded-none" />
+                                        <Skeleton className="h-12 flex-1 rounded-none" />
+                                    </div>
+                                    <div className="bg-white p-6 space-y-4">
+                                        <Skeleton className="h-32 w-full" />
+                                        <Skeleton className="h-24 w-full" />
+                                        <Skeleton className="h-40 w-full" />
+                                        <Skeleton className="h-24 w-full" />
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <MigrationAssessmentReport
+                                objects={objects}
+                                relationships={relationships}
+                                complex_analysis={report?.complex_analysis ?? null}
+                                summary={report?.summary ?? null}
+                                challenges={report?.challenges ?? null}
+                                appendix={report?.appendix ?? null}
+                                usage_stats={report?.usage_stats ?? null}
+                                assessmentName={assessment.name}
+                                biTool={assessment.bi_tool}
+                                createdAt={assessment.created_at}
+                            />
+                        )
                     )}
                 </TabsContent>
                 
