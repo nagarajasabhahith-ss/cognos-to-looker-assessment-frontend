@@ -58,7 +58,7 @@ export function VisualizationSummary({ data, isLoading }: VisualizationSummaryPr
         );
     }
 
-    const { total_visualization, stats, breakdown } = data;
+    const { total_visualization, overall_complexity, stats, breakdown } = data;
     const [open, setOpen] = useState(false);
     const statItems = stats
         ? [
@@ -72,7 +72,14 @@ export function VisualizationSummary({ data, isLoading }: VisualizationSummaryPr
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Visualization Summary</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Visualization Summary</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total visualizations: {total_visualization}. Breakdown by type: count, dashboards/reports/queries containing (from API).
                 </CardDescription>

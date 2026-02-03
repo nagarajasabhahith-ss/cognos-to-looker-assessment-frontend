@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import type { ExtractedObject, ObjectRelationship } from "@/lib/api";
 import type { MigrationAssessmentReportProps } from "./types";
-import { calculateOverallComplexity } from "./utils";
 import { buildPageNumbers } from "./utils";
 import type { PageNumber } from "./types";
 
@@ -18,6 +17,7 @@ export function useReportData(props: MigrationAssessmentReportProps) {
         challenges,
         appendix,
         createdAt,
+        summary,
     } = props;
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -165,9 +165,12 @@ export function useReportData(props: MigrationAssessmentReportProps) {
         [appendixReportTotalPages, appendixReportPage]
     );
 
+    /** Overall complexity from API only (no local computation). */
     const overallComplexity = useMemo(
-        () => calculateOverallComplexity(objects, relationships),
-        [objects, relationships]
+        () => (summary?.overall_complexity != null && summary.overall_complexity !== ""
+            ? summary.overall_complexity
+            : ""),
+        [summary?.overall_complexity]
     );
 
     const formattedDate = createdAt

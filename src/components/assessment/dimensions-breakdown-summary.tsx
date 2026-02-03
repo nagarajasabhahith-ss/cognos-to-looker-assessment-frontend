@@ -23,7 +23,7 @@ function complexityBadgeVariant(
     complexity: string | null | undefined
 ): "default" | "secondary" | "destructive" | "outline" {
     const c = (complexity ?? "").toLowerCase();
-    if (c === "critical") return "destructive";
+    if (c === "critical" || c === "high") return "destructive";
     if (c === "medium") return "default";
     if (c === "low") return "secondary";
     return "outline";
@@ -59,7 +59,7 @@ export function DimensionsBreakdownSummary({ data, isLoading }: DimensionsBreakd
         );
     }
 
-    const { total_dimensions, dimensions } = data;
+    const { total_dimensions, overall_complexity, dimensions } = data;
     const stats = dimensions.reduce(
         (acc, d) => {
             const c = (d.complexity ?? "").toLowerCase();
@@ -79,7 +79,14 @@ export function DimensionsBreakdownSummary({ data, isLoading }: DimensionsBreakd
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Dimensions</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Dimensions</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total dimensions: {total_dimensions}. Per-dimension: name, complexity (from expression), usage, parent data module, dashboards/reports containing.
                 </CardDescription>

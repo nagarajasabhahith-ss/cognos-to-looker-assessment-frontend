@@ -141,16 +141,29 @@ export function useAssessmentObjects(id: string, enabled: boolean = true) {
 export function useAssessmentReport(id: string, enabled: boolean = true) {
     const [report, setReport] = useState<AssessmentReport | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchReport = useCallback(async () => {
         if (!enabled) return;
 
+        setError(null);
         setIsLoading(true);
         try {
             const res = await assessmentApi.getReport(id);
             setReport(res.data);
-        } catch (error) {
-            console.error("Failed to fetch report", error);
+        } catch (err: unknown) {
+            const axiosErr = err as { code?: string; message?: string; response?: { status?: number }; config?: { baseURL?: string } };
+            console.error("Failed to fetch report", err);
+            if (axiosErr?.code === "ERR_NETWORK" || axiosErr?.message === "Network Error") {
+                const base = axiosErr?.config?.baseURL ?? "http://localhost:8000/api";
+                setError(`Cannot reach the API at ${base}. Ensure the backend is running (e.g. \`make run\` or \`uvicorn app.main:app --reload\`).`);
+            } else if (axiosErr?.response?.status === 401) {
+                setError("You are not signed in. Please sign in and try again.");
+            } else if (axiosErr?.response?.status === 404) {
+                setError("Report or assessment not found.");
+            } else {
+                setError(axiosErr?.message ?? "Failed to load report.");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -165,6 +178,7 @@ export function useAssessmentReport(id: string, enabled: boolean = true) {
     return {
         report,
         isLoading,
+        error,
         refetch: fetchReport,
     };
 }

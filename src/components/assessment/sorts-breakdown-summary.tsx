@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 
 function complexityBadgeVariant(c: string | null | undefined): "default" | "secondary" | "destructive" | "outline" {
     const x = (c ?? "").toLowerCase();
+    if (x === "critical" || x === "high") return "destructive";
     if (x === "medium") return "default";
     if (x === "low") return "secondary";
     return "outline";
@@ -56,7 +57,7 @@ export function SortsBreakdownSummary({ data, isLoading }: SortsBreakdownSummary
         );
     }
 
-    const { total_sorts, stats, sorts } = data;
+    const { total_sorts, overall_complexity, stats, sorts } = data;
     const statItems = stats
         ? [
             { label: "Low", count: stats.low ?? 0, variant: "secondary" as const },
@@ -69,7 +70,14 @@ export function SortsBreakdownSummary({ data, isLoading }: SortsBreakdownSummary
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Sorts</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Sorts</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total sorts: {total_sorts}. Per-sort: name, direction, sorted column, dashboards/reports containing.
                 </CardDescription>

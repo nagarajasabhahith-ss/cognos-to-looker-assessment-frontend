@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 
 function complexityBadgeVariant(c: string | null | undefined): "default" | "secondary" | "destructive" | "outline" {
     const x = (c ?? "").toLowerCase();
+    if (x === "critical" || x === "high") return "destructive";
     if (x === "medium") return "default";
     if (x === "low") return "secondary";
     return "outline";
@@ -60,6 +61,7 @@ export function DataModulesBreakdownSummary({ data, isLoading }: DataModulesBrea
         total_data_modules,
         total_main_data_modules = 0,
         total_unique_modules,
+        overall_complexity,
         stats,
         data_modules = [],
         main_data_modules = [],
@@ -77,7 +79,14 @@ export function DataModulesBreakdownSummary({ data, isLoading }: DataModulesBrea
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Data Modules</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Data Modules</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Main data modules (module, dataModule, model): {total_main_data_modules}. Total (incl. smartsModule, modelView): {total_data_modules}, unique: {total_unique_modules}.
                     Per-module: dashboards and reports using each; tables, columns, calculated fields, filters. Complexity: Medium for all data modules.

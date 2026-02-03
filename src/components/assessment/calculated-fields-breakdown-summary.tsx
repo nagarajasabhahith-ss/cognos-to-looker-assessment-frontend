@@ -23,7 +23,7 @@ function complexityBadgeVariant(
     complexity: string | null | undefined
 ): "default" | "secondary" | "destructive" | "outline" {
     const c = (complexity ?? "").toLowerCase();
-    if (c === "critical") return "destructive";
+    if (c === "critical" || c === "high") return "destructive";
     if (c === "medium") return "default";
     if (c === "low") return "secondary";
     return "outline";
@@ -59,7 +59,7 @@ export function CalculatedFieldsBreakdownSummary({ data, isLoading }: Calculated
         );
     }
 
-    const { total_calculated_fields, calculated_fields } = data;
+    const { total_calculated_fields, overall_complexity, calculated_fields } = data;
     const stats = calculated_fields.reduce(
         (acc, f) => {
             const c = (f.complexity ?? "").toLowerCase();
@@ -79,7 +79,14 @@ export function CalculatedFieldsBreakdownSummary({ data, isLoading }: Calculated
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Calculated Fields</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Calculated Fields</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total calculated fields: {total_calculated_fields}. Per-field: name, type, complexity, dashboards/reports containing, expression.
                 </CardDescription>

@@ -59,7 +59,7 @@ export function ReportsBreakdownSummary({ data, isLoading }: ReportsBreakdownSum
         );
     }
 
-    const { total_reports, stats, reports } = data;
+    const { total_reports, overall_complexity, stats, reports } = data;
     const statItems = stats
         ? [
             { label: "Low", count: stats.low ?? 0, variant: "secondary" as const },
@@ -72,7 +72,14 @@ export function ReportsBreakdownSummary({ data, isLoading }: ReportsBreakdownSum
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Reports Breakdown</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Reports Breakdown</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total reports: {total_reports}. Per-report counts (visualizations, pages, tables, columns, filters, parameters, measures, dimensions, etc.).
                 </CardDescription>
@@ -112,6 +119,7 @@ export function ReportsBreakdownSummary({ data, isLoading }: ReportsBreakdownSum
                                         <TableHead className="text-right" title="Total viz; below: L=Low, M=Medium, H=High, C=Critical">
                                             Viz
                                         </TableHead>
+                                        <TableHead className="text-right">Viz types</TableHead>
                                         <TableHead className="text-right">Pages</TableHead>
                                         <TableHead className="text-right">Measures</TableHead>
                                         <TableHead className="text-right">Dimensions</TableHead>
@@ -132,7 +140,7 @@ export function ReportsBreakdownSummary({ data, isLoading }: ReportsBreakdownSum
                                 <TableBody>
                                     {reports.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={17} className="text-muted-foreground text-center">
+                                            <TableCell colSpan={18} className="text-muted-foreground text-center">
                                                 No report data
                                             </TableCell>
                                         </TableRow>
@@ -182,6 +190,11 @@ export function ReportsBreakdownSummary({ data, isLoading }: ReportsBreakdownSum
                                                             </div>
                                                         )}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {(r.visualization_type_names?.length ?? 0) > 0
+                                                        ? (r.visualization_type_names ?? []).join(", ")
+                                                        : "—"}
                                                 </TableCell>
                                                 <TableCell className="text-right">{r.total_pages ?? 0}</TableCell>
                                                 <TableCell className="text-right">{r.total_measures ?? 0}</TableCell>

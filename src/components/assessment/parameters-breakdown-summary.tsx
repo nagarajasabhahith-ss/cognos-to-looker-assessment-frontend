@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 
 function complexityBadgeVariant(c: string | null | undefined): "default" | "secondary" | "destructive" | "outline" {
     const x = (c ?? "").toLowerCase();
+    if (x === "critical" || x === "high") return "destructive";
     if (x === "medium") return "default";
     if (x === "low") return "secondary";
     return "outline";
@@ -56,7 +57,7 @@ export function ParametersBreakdownSummary({ data, isLoading }: ParametersBreakd
         );
     }
 
-    const { total_parameters, stats, parameters } = data;
+    const { total_parameters, overall_complexity, stats, parameters } = data;
     const statItems = stats
         ? [
             { label: "Low", count: stats.low ?? 0, variant: "secondary" as const },
@@ -69,7 +70,14 @@ export function ParametersBreakdownSummary({ data, isLoading }: ParametersBreakd
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Parameters</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Parameters</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total parameters: {total_parameters}. Per-parameter: name, type, dashboards/reports containing.
                 </CardDescription>

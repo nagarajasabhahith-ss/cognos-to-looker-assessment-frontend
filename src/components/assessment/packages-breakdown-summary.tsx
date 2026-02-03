@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 
 function complexityBadgeVariant(c: string | null | undefined): "default" | "secondary" | "destructive" | "outline" {
     const x = (c ?? "").toLowerCase();
+    if (x === "critical" || x === "high") return "destructive";
     if (x === "medium") return "default";
     if (x === "low") return "secondary";
     return "outline";
@@ -56,7 +57,7 @@ export function PackagesBreakdownSummary({ data, isLoading }: PackagesBreakdownS
         );
     }
 
-    const { total_packages, stats, packages } = data;
+    const { total_packages, overall_complexity, stats, packages } = data;
 
     const statItems = stats
         ? [
@@ -70,7 +71,14 @@ export function PackagesBreakdownSummary({ data, isLoading }: PackagesBreakdownS
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Packages Breakdown</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Packages Breakdown</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total packages: {total_packages}. Per-package counts (data modules by type, tables, columns), dashboards/reports using each. Complexity: Medium when data modules &gt; 2, else Low.
                 </CardDescription>

@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 
 function complexityBadgeVariant(c: string | null | undefined): "default" | "secondary" | "destructive" | "outline" {
     const x = (c ?? "").toLowerCase();
+    if (x === "critical" || x === "high") return "destructive";
     if (x === "medium") return "default";
     if (x === "low") return "secondary";
     return "outline";
@@ -56,7 +57,7 @@ export function QueriesBreakdownSummary({ data, isLoading }: QueriesBreakdownSum
         );
     }
 
-    const { total_queries, stats, queries } = data;
+    const { total_queries, overall_complexity, stats, queries } = data;
     const statItems = stats
         ? [
             { label: "Low", count: stats.low ?? 0, variant: "secondary" as const },
@@ -69,7 +70,14 @@ export function QueriesBreakdownSummary({ data, isLoading }: QueriesBreakdownSum
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Queries</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Queries</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total queries: {total_queries}. Per-query: name, source type, report, simple vs complex, dashboards/reports containing.
                 </CardDescription>

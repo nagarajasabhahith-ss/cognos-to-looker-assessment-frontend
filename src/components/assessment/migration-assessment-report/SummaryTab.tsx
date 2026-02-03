@@ -13,6 +13,7 @@ interface SummaryTabProps {
         totalDashboards: number;
         totalReports: number;
     };
+    /** Overall complexity from API only (displayed when non-empty). */
     overallComplexity: string;
     biTool?: string;
 }
@@ -36,15 +37,57 @@ export function SummaryTab({
                         focusing on inventory, usage, and complexity to inform the Looker migration strategy.
                     </p>
                 </div>
-                <div className="mb-6">
-                    <span className="text-lg font-semibold">Overall Complexity Score: </span>
-                    <Badge variant={getComplexityBadgeVariant(overallComplexity)} className="ml-2 text-lg">
-                        {overallComplexity}
-                    </Badge>
-                </div>
+                {overallComplexity !== "" && (
+                    <div className="mb-6">
+                        <span className="text-lg font-semibold">Overall Complexity: </span>
+                        <Badge variant={getComplexityBadgeVariant(overallComplexity)} className="ml-2 text-lg">
+                            {overallComplexity}
+                        </Badge>
+                    </div>
+                )}
             </div>
 
-            {summary?.key_findings && summary.key_findings.length > 0 && (
+            {/* Overall Key Findings */}
+            {summary?.overall_key_findings && summary.overall_key_findings.length > 0 && (
+                <div>
+                    <h3 className="text-[var(--deep-green)] text-2xl font-semibold mb-4 border-l-4 border-[var(--royal-gold)] pl-4">
+                        Overall Key Findings
+                    </h3>
+                    <div className="mb-8 rounded-lg shadow-md overflow-hidden border border-[var(--light-cream)] [font-family:var(--font-roboto-condensed)]">
+                        <Table className="text-lg">
+                            <TableHeader>
+                                <TableRow className="bg-[var(--deep-green)] hover:bg-[var(--deep-green)] border-b-2 border-[var(--light-cream)]">
+                                    <TableHead className="text-white font-bold rounded-tl-lg py-4 px-5 h-auto">AREA</TableHead>
+                                    <TableHead className="text-white font-bold py-4 px-5 h-auto text-center">COMPLEXITY / IMPACT</TableHead>
+                                    {/* <TableHead className="text-white font-bold py-4 px-5 h-auto text-left">COUNT</TableHead> */}
+                                    <TableHead className="text-white font-bold py-4 px-5 h-auto text-left">DASHBOARD</TableHead>
+                                    <TableHead className="text-white font-bold text-right rounded-tr-lg py-4 px-5 h-auto text-left">REPORT</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {summary.overall_key_findings.map((finding, idx) => {
+                                    const isLast = idx === summary.overall_key_findings!.length - 1;
+                                    return (
+                                        <TableRow key={idx} className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-[var(--light-cream)]`}>
+                                            <TableCell className={`font-medium text-gray-900 py-4 px-5 ${isLast ? "rounded-bl-lg" : ""}`}>{finding.feature_area}</TableCell>
+                                            <TableCell className="text-gray-900 py-4 px-5 text-center">
+                                                {finding.complexity
+                                                    ? finding.complexity.charAt(0).toUpperCase() + finding.complexity.slice(1).toLowerCase()
+                                                    : finding.complexity}
+                                            </TableCell>
+                                            {/* <TableCell className="text-gray-900 py-4 px-5 text-left">{finding.count}</TableCell> */}
+                                            <TableCell className="text-gray-900 py-4 px-5 text-left">{finding.dashboards_summary}</TableCell>
+                                            <TableCell className={`text-gray-900 py-4 px-5 text-left ${isLast ? "rounded-br-lg" : ""}`}>{finding.reports_summary}</TableCell>
+                                        </TableRow>
+                                    );
+                                })}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
+            )}
+
+            {/* {summary?.key_findings && summary.key_findings.length > 0 && (
                 <div>
                     <h3 className="text-[var(--deep-green)] text-2xl font-semibold mb-4 border-l-4 border-[var(--royal-gold)] pl-4">
                         Key Findings
@@ -67,9 +110,9 @@ export function SummaryTab({
                                         <TableRow key={idx} className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-[var(--light-cream)]`}>
                                             <TableCell className={`font-medium text-gray-900 py-4 px-5 ${isLast ? "rounded-bl-lg" : ""}`}>{finding.feature_area}</TableCell>
                                             <TableCell className="text-gray-900 py-4 px-5 text-center">
-                                                <Badge variant={getComplexityBadgeVariant(finding.complexity)}>
-                                                    {finding.complexity}
-                                                </Badge>
+                                                {finding.complexity
+                                                    ? finding.complexity.charAt(0).toUpperCase() + finding.complexity.slice(1).toLowerCase()
+                                                    : finding.complexity}
                                             </TableCell>
                                             <TableCell className="text-gray-900 py-4 px-5 text-left">{finding.count}</TableCell>
                                             <TableCell className="text-gray-900 py-4 px-5 text-left">{finding.dashboards_summary}</TableCell>
@@ -81,7 +124,7 @@ export function SummaryTab({
                         </Table>
                     </div>
                 </div>
-            )}
+            )} */}
 
             {summary?.high_level_complexity_overview && summary.high_level_complexity_overview.length > 0 && (
                 <div>

@@ -173,6 +173,8 @@ export interface VisualizationComplexityStats {
 
 export interface VisualizationDetails {
     total_visualization: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     breakdown: VisualizationBreakdownItem[];
 }
@@ -185,6 +187,10 @@ export interface DashboardBreakdownItem {
     total_visualizations: number;
     /** Per-dashboard counts by complexity (low, medium, high, critical) */
     visualizations_by_complexity?: VisualizationComplexityStats;
+    /** Viz type names used in this dashboard (e.g. Pie, Bar, Line) */
+    visualization_type_names?: string[];
+    /** Weighted average of visualization complexities in this dashboard (linear: low=1, medium=2, high=3, critical=4) */
+    visualization_overall_complexity?: string | null;
     total_tabs: number;
     total_measures: number;
     total_dimensions: number;
@@ -196,6 +202,8 @@ export interface DashboardBreakdownItem {
 
 export interface DashboardsBreakdown {
     total_dashboards: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     /** Count of dashboards by derived complexity (low, medium, high, critical). */
     stats?: VisualizationComplexityStats;
     dashboards: DashboardBreakdownItem[];
@@ -210,6 +218,8 @@ export interface ReportBreakdownItem {
     total_visualizations: number;
     /** Per-report counts by complexity (low, medium, high, critical) */
     visualizations_by_complexity?: VisualizationComplexityStats;
+    /** Viz type names used in this report (e.g. Pie, Bar, Line) */
+    visualization_type_names?: string[];
     /** Calculated fields in this report by complexity (informational only; does not affect report complexity) */
     calculated_fields_by_complexity?: VisualizationComplexityStats;
     total_pages: number;
@@ -229,6 +239,8 @@ export interface ReportBreakdownItem {
 
 export interface ReportsBreakdown {
     total_reports: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     /** Count of reports by derived complexity (low, medium, high, critical). */
     stats?: VisualizationComplexityStats;
     reports: ReportBreakdownItem[];
@@ -252,6 +264,8 @@ export interface PackageBreakdownItem {
 
 export interface PackagesBreakdown {
     total_packages: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     packages: PackageBreakdownItem[];
 }
@@ -276,6 +290,8 @@ export interface DataSourceConnectionsBreakdown {
     total_unique_connections: number;
     total_data_modules: number;
     total_packages: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     connections: DataSourceConnectionBreakdownItem[];
 }
@@ -297,6 +313,8 @@ export interface CalculatedFieldBreakdownItem {
 
 export interface CalculatedFieldsBreakdown {
     total_calculated_fields: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     calculated_fields: CalculatedFieldBreakdownItem[];
 }
 
@@ -329,6 +347,8 @@ export interface FilterBreakdownItem {
 
 export interface FiltersBreakdown {
     total_filters: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     filters: FilterBreakdownItem[];
 }
@@ -348,6 +368,8 @@ export interface ParameterBreakdownItem {
 
 export interface ParametersBreakdown {
     total_parameters: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     parameters: ParameterBreakdownItem[];
     by_complexity?: Record<string, ParameterByComplexityItem>;
@@ -369,6 +391,8 @@ export interface SortBreakdownItem {
 
 export interface SortsBreakdown {
     total_sorts: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     sorts: SortBreakdownItem[];
     by_complexity?: Record<string, SortByComplexityItem>;
@@ -389,6 +413,8 @@ export interface PromptBreakdownItem {
 
 export interface PromptsBreakdown {
     total_prompts: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     prompts: PromptBreakdownItem[];
     by_complexity?: Record<string, PromptByComplexityItem>;
@@ -421,6 +447,8 @@ export interface DataModulesBreakdown {
     total_data_modules: number;
     total_main_data_modules: number;
     total_unique_modules: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     data_modules: DataModuleBreakdownItem[];
     main_data_modules: DataModuleBreakdownItem[];
@@ -445,6 +473,8 @@ export interface QueryBreakdownItem {
 
 export interface QueriesBreakdown {
     total_queries: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     stats?: VisualizationComplexityStats;
     queries: QueryBreakdownItem[];
     by_complexity?: Record<string, QueryByComplexityItem>;
@@ -473,6 +503,8 @@ export interface MeasureBreakdownItem {
 
 export interface MeasuresBreakdown {
     total_measures: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     measures: MeasureBreakdownItem[];
 }
 
@@ -498,6 +530,8 @@ export interface DimensionBreakdownItem {
 
 export interface DimensionsBreakdown {
     total_dimensions: number;
+    /** Overall complexity from linear weighted model (low=1, medium=2, high=3, critical=4). */
+    overall_complexity?: string | null;
     dimensions: DimensionBreakdownItem[];
 }
 
@@ -636,6 +670,10 @@ export interface ChallengeItem {
 
 export interface Summary {
     key_findings: KeyFinding[];
+    /** Per feature area: overall_complexity (linear), total count, % of dashboards/reports containing any. */
+    overall_key_findings?: KeyFinding[];
+    /** Final overall complexity: linear weighted average by count across all sections (Option 1). */
+    overall_complexity?: string | null;
     high_level_complexity_overview?: HighLevelComplexityOverviewItem[];
     inventory?: InventoryItem[];
 }

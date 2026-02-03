@@ -185,7 +185,9 @@ export function AssessmentReportPdf({ data }: AssessmentReportPdfProps) {
                     This assessment analyzed the {biTool} environment ({inventorySummary.totalDashboards} dashboards, {inventorySummary.totalReports} reports)
                     focusing on inventory, usage, and complexity to inform the Looker migration strategy.
                 </Text>
-                <Text style={styles.bodyText}>Overall Complexity Score: {overallComplexity}</Text>
+                {overallComplexity !== "" && (
+                    <Text style={styles.bodyText}>Overall Complexity: {overallComplexity}</Text>
+                )}
 
                 {summary?.key_findings && summary.key_findings.length > 0 && (
                     <>

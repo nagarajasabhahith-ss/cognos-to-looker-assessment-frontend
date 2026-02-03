@@ -23,7 +23,7 @@ function complexityBadgeVariant(
     complexity: string | null | undefined
 ): "default" | "secondary" | "destructive" | "outline" {
     const c = (complexity ?? "").toLowerCase();
-    if (c === "critical") return "destructive";
+    if (c === "critical" || c === "high") return "destructive";
     if (c === "medium") return "default";
     if (c === "low") return "secondary";
     return "outline";
@@ -59,7 +59,7 @@ export function MeasuresBreakdownSummary({ data, isLoading }: MeasuresBreakdownS
         );
     }
 
-    const { total_measures, measures } = data;
+    const { total_measures, overall_complexity, measures } = data;
     const stats = measures.reduce(
         (acc, m) => {
             const c = (m.complexity ?? "").toLowerCase();
@@ -79,7 +79,14 @@ export function MeasuresBreakdownSummary({ data, isLoading }: MeasuresBreakdownS
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Measures</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Measures</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total measures: {total_measures}. Per-measure: name, complexity (from expression), aggregation, parent data module, dashboards/reports containing.
                 </CardDescription>

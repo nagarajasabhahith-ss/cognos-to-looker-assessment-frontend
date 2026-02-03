@@ -45,7 +45,7 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
         refetch: refetchObjects,
     } = useAssessmentObjects(id, hasResults);
 
-    const { report, isLoading: isLoadingReport } = useAssessmentReport(id, hasResults);
+    const { report, isLoading: isLoadingReport, error: reportError, refetch: refetchReport } = useAssessmentReport(id, hasResults);
 
     const [isRunning, setIsRunning] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
@@ -117,6 +117,19 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
                 <TabsContent value="inventory-summary">
                     {hasResults && (
                         <div className="space-y-6">
+                            {reportError && (
+                                <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 p-4 text-sm text-amber-800 dark:text-amber-200">
+                                    <p className="font-medium">Could not load report data</p>
+                                    <p className="mt-1">{reportError}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => refetchReport()}
+                                        className="mt-3 rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+                                    >
+                                        Retry
+                                    </button>
+                                </div>
+                            )}
                             <VisualizationSummary
                                 data={report?.sections?.visualization_details ?? null}
                                 isLoading={isLoadingReport}
@@ -179,7 +192,19 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
 
                 <TabsContent value="migration-report">
                     {hasResults && (
-                        isLoadingReport || isLoadingObjects ? (
+                        reportError ? (
+                            <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 p-4 text-sm text-amber-800 dark:text-amber-200">
+                                <p className="font-medium">Could not load report</p>
+                                <p className="mt-1">{reportError}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => refetchReport()}
+                                    className="mt-3 rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+                                >
+                                    Retry
+                                </button>
+                            </div>
+                        ) : isLoadingReport || isLoadingObjects ? (
                             <div className="w-full space-y-6">
                                 <div className="flex flex-col gap-2">
                                     <Skeleton className="h-8 w-48" />

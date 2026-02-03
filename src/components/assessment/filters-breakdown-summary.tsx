@@ -23,6 +23,7 @@ function complexityBadgeVariant(
     complexity: string | null | undefined
 ): "default" | "secondary" | "destructive" | "outline" {
     const c = (complexity ?? "").toLowerCase();
+    if (c === "critical" || c === "high") return "destructive";
     if (c === "medium") return "default";
     if (c === "low") return "secondary";
     return "outline";
@@ -58,7 +59,7 @@ export function FiltersBreakdownSummary({ data, isLoading }: FiltersBreakdownSum
         );
     }
 
-    const { total_filters, stats, filters } = data;
+    const { total_filters, overall_complexity, stats, filters } = data;
     const statItems = stats
         ? [
             { label: "Low", count: stats.low ?? 0, variant: "secondary" as const },
@@ -71,7 +72,14 @@ export function FiltersBreakdownSummary({ data, isLoading }: FiltersBreakdownSum
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Filters</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Filters</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total filters: {total_filters}. Per-filter: type (detail/summary), scope (query/report/data module), style (expression/definition), simple vs complex, dashboards/reports containing, associated report/query.
                 </CardDescription>

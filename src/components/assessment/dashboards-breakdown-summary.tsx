@@ -59,7 +59,7 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
         );
     }
 
-    const { total_dashboards, stats, dashboards } = data;
+    const { total_dashboards, overall_complexity, stats, dashboards } = data;
     const statItems = stats
         ? [
             { label: "Low", count: stats.low ?? 0, variant: "secondary" as const },
@@ -72,7 +72,14 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Dashboards Breakdown</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Dashboards Breakdown</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Total dashboards: {total_dashboards}. Per-dashboard counts (visualizations, tabs, measures, dimensions, etc.).
                 </CardDescription>
@@ -111,6 +118,8 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
                                         <TableHead className="text-right" title="Total viz; below: L=Low, M=Medium, H=High, C=Critical">
                                             Viz
                                         </TableHead>
+                                        <TableHead className="text-right">Viz types</TableHead>
+                                        <TableHead className="text-right" title="Visualization Overall Complexity (weighted average)">VOC</TableHead>
                                         <TableHead className="text-right">Tabs</TableHead>
                                         <TableHead className="text-right">Measures</TableHead>
                                         <TableHead className="text-right">Dimensions</TableHead>
@@ -123,7 +132,7 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
                                 <TableBody>
                                     {dashboards.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={10} className="text-muted-foreground text-center">
+                                            <TableCell colSpan={12} className="text-muted-foreground text-center">
                                                 No dashboard data
                                             </TableCell>
                                         </TableRow>
@@ -172,6 +181,20 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
                                                             </div>
                                                         )}
                                                     </div>
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {(d.visualization_type_names?.length ?? 0) > 0
+                                                        ? (d.visualization_type_names ?? []).join(", ")
+                                                        : "—"}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    {d.visualization_overall_complexity != null && d.visualization_overall_complexity !== "" ? (
+                                                        <Badge variant={complexityBadgeVariant(d.visualization_overall_complexity)}>
+                                                            {d.visualization_overall_complexity}
+                                                        </Badge>
+                                                    ) : (
+                                                        "—"
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="text-right">{d.total_tabs ?? 0}</TableCell>
                                                 <TableCell className="text-right">{d.total_measures ?? 0}</TableCell>

@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 
 function complexityBadgeVariant(c: string | null | undefined): "default" | "secondary" | "destructive" | "outline" {
     const x = (c ?? "").toLowerCase();
+    if (x === "critical" || x === "high") return "destructive";
     if (x === "medium") return "default";
     if (x === "low") return "secondary";
     return "outline";
@@ -62,6 +63,7 @@ export function DataSourceConnectionsSummary({ data, isLoading }: DataSourceConn
         total_unique_connections,
         total_data_modules,
         total_packages,
+        overall_complexity,
         stats,
         connections,
     } = data;
@@ -78,7 +80,14 @@ export function DataSourceConnectionsSummary({ data, isLoading }: DataSourceConn
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Data Source Connections</CardTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                    <CardTitle>Data Source Connections</CardTitle>
+                    {overall_complexity != null && overall_complexity !== "" && (
+                        <Badge variant={complexityBadgeVariant(overall_complexity)}>
+                            Overall: {overall_complexity}
+                        </Badge>
+                    )}
+                </div>
                 <CardDescription>
                     Data sources: {total_data_sources}, connections: {total_data_source_connections}, unique: {total_unique_connections}.
                     Data modules: {total_data_modules}, packages: {total_packages}. Per-connection: dashboards and reports using each.
