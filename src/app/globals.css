@@ -39,10 +39,13 @@
 
   --radius: 0.625rem;
 
-  /* Assessment report */
+  /* Assessment report / brand */
   --light-cream: #f0ede4;
   --royal-gold: #c29a4a;
   --deep-green: #1a5f3f;
+  --color-deep-green: #1a5f3f;
+  --color-royal-gold: #c29a4a;
+  --color-light-cream: #f0ede4;
 
   --color-sidebar: oklch(0.985 0 0);
   --color-sidebar-foreground: oklch(0.145 0 0);
@@ -70,6 +73,11 @@
   h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
     font-family: var(--font-fjalla-one), sans-serif !important;
   }
+}
 
-  
+/* Shared content width for header + main — aligns layout */
+@layer utilities {
+  .content-width {
+    @apply mx-auto w-full max-w-7xl px-6 lg:px-8;
+  }
 }
