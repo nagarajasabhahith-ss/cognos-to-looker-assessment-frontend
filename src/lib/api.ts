@@ -198,6 +198,9 @@ export interface DashboardBreakdownItem {
     total_data_modules: number;
     total_packages: number;
     total_data_sources: number;
+    total_sorts: number;
+    total_prompts: number;
+    total_parameters: number;
 }
 
 export interface DashboardsBreakdown {
@@ -405,6 +408,7 @@ export interface PromptBreakdownItem {
     complexity?: string;
     prompt_type?: string;
     value?: string;
+    cognos_class?: string;
     cognosClass?: string;
     dashboards_containing_count?: number;
     reports_containing_count?: number;
@@ -462,6 +466,8 @@ export interface QueryBreakdownItem {
     source_type?: string;
     is_simple?: boolean;
     is_complex?: boolean;
+    /** True when this query backs a prompt (shown only in Queries, not duplicated in Prompts). */
+    is_prompt_query?: boolean;
     report_id?: string;
     report_name?: string;
     cognos_class?: string;
@@ -619,6 +625,13 @@ export interface QueryByComplexityItem {
     reports_containing_count: number;
 }
 
+export interface DataModuleByComplexityItem {
+    complexity: string;
+    data_module_count: number;
+    dashboards_containing_count: number;
+    reports_containing_count: number;
+}
+
 export interface ComplexAnalysis {
     visualization: VisualizationByComplexityItem[];
     dashboard?: DashboardByComplexityItem[];
@@ -631,6 +644,7 @@ export interface ComplexAnalysis {
     sort?: SortByComplexityItem[];
     prompt?: PromptByComplexityItem[];
     query?: QueryByComplexityItem[];
+    data_module?: DataModuleByComplexityItem[];
 }
 
 /** Key finding per feature area from report summary (representative complexity, count, usage in dashboards/reports). */
@@ -704,6 +718,26 @@ export interface AssessmentReport {
     appendix?: { dashboards: AppendixItem[]; reports: AppendixItem[] } | null;
     /** Optional usage stats from usage_stats.json (usage_stats, content_creation, user_stats, performance, quick_wins, pilot_recommendations). */
     usage_stats?: Record<string, unknown> | null;
+    /** Full details per dashboard: name, viz_types, calculated_fields, measures, dimensions, filters, queries, columns. */
+    full_details_by_dashboard?: DashboardFullDetailsItem[] | null;
+}
+
+/** Per-dashboard full details (tabs, visualizations with data_items, measures, dimensions, filters, queries, columns, packages, data_modules, data_sources). */
+export interface DashboardFullDetailsItem {
+    dashboard_id: string;
+    dashboard_name: string;
+    viz_types: string[];
+    tabs: Array<{ id: string; name: string }>;
+    visualizations: Array<{ id: string; name: string; viz_type: string; data_items?: Array<Record<string, unknown>> }>;
+    calculated_fields: Array<{ id: string; name: string; expression?: string; calculation_type?: string; complexity?: string; [k: string]: unknown }>;
+    measures: Array<{ id: string; name: string; aggregation?: string; expression?: string; parent_module_name?: string; complexity?: string; [k: string]: unknown }>;
+    dimensions: Array<{ id: string; name: string; usage?: string; expression?: string; parent_module_name?: string; complexity?: string; [k: string]: unknown }>;
+    filters: Array<{ id: string; name: string; expression?: string; filter_type?: string; filter_scope?: string; complexity?: string; [k: string]: unknown }>;
+    queries: Array<{ id: string; name: string }>;
+    columns: Array<{ id: string; name: string }>;
+    packages: Array<{ id: string; name: string }>;
+    data_modules: Array<{ id: string; name: string; display_name?: string }>;
+    data_sources: Array<{ id: string; name: string }>;
 }
 
 /** Appendix row: name, package(s), data module(s), owner (for dashboard or report). */

@@ -79,7 +79,7 @@ export function QueriesBreakdownSummary({ data, isLoading }: QueriesBreakdownSum
                     )}
                 </div>
                 <CardDescription>
-                    Total queries: {total_queries}. Per-query: name, source type, report, simple vs complex, dashboards/reports containing.
+                    Total queries: {total_queries}. Per-query: name, source type, report, kind (simple/complex/prompt query), cognos class, dashboards/reports containing, SQL preview.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -111,6 +111,8 @@ export function QueriesBreakdownSummary({ data, isLoading }: QueriesBreakdownSum
                                         <TableHead>Source type</TableHead>
                                         <TableHead>Report</TableHead>
                                         <TableHead>Kind</TableHead>
+                                        <TableHead>Prompt query</TableHead>
+                                        <TableHead>Cognos class</TableHead>
                                         <TableHead className="text-right">Dashboards</TableHead>
                                         <TableHead className="text-right">Reports</TableHead>
                                         <TableHead className="max-w-[200px]">SQL (preview)</TableHead>
@@ -119,7 +121,7 @@ export function QueriesBreakdownSummary({ data, isLoading }: QueriesBreakdownSum
                                 <TableBody>
                                     {queries.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={8} className="text-muted-foreground text-center">
+                                            <TableCell colSpan={10} className="text-muted-foreground text-center">
                                                 No queries
                                             </TableCell>
                                         </TableRow>
@@ -148,6 +150,16 @@ export function QueriesBreakdownSummary({ data, isLoading }: QueriesBreakdownSum
                                                     ) : (
                                                         "—"
                                                     )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {q.is_prompt_query ? (
+                                                        <Badge variant="outline">Yes</Badge>
+                                                    ) : (
+                                                        "—"
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground text-sm max-w-[140px] truncate" title={q.cognos_class ?? ""}>
+                                                    {q.cognos_class ?? "—"}
                                                 </TableCell>
                                                 <TableCell className="text-right tabular-nums">
                                                     {q.dashboards_containing_count ?? 0}

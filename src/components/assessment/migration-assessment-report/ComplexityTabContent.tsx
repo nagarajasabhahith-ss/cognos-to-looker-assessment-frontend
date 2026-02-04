@@ -65,6 +65,11 @@ const SECTION_CONFIG: Array<{
         { header: "DASHBOARDS AFFECTED", key: "dashboards_containing_count", alignRight: true },
         { header: "REPORTS AFFECTED", key: "reports_containing_count", alignRight: true },
     ]},
+    { key: "data_module", title: "Data Module", featureAreaLabel: "Data Module", columns: [
+        { header: "DATA MODULES", key: "data_module_count", alignRight: true },
+        { header: "DASHBOARDS AFFECTED", key: "dashboards_containing_count", alignRight: true },
+        { header: "REPORTS AFFECTED", key: "reports_containing_count", alignRight: true },
+    ]},
 ];
 
 export function ComplexityTabContent({ complex_analysis }: ComplexityTabContentProps) {

@@ -79,7 +79,7 @@ export function PromptsBreakdownSummary({ data, isLoading }: PromptsBreakdownSum
                     )}
                 </div>
                 <CardDescription>
-                    Total prompts: {total_prompts}. Per-prompt: name, type, value, dashboards/reports containing.
+                    Total prompts: {total_prompts}. Per-prompt: name, type, value, cognos class, dashboards/reports containing.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -110,6 +110,7 @@ export function PromptsBreakdownSummary({ data, isLoading }: PromptsBreakdownSum
                                         <TableHead>Complexity</TableHead>
                                         <TableHead>Type</TableHead>
                                         <TableHead>Value</TableHead>
+                                        <TableHead>Cognos class</TableHead>
                                         <TableHead className="text-right">Dashboards</TableHead>
                                         <TableHead className="text-right">Reports</TableHead>
                                     </TableRow>
@@ -117,7 +118,7 @@ export function PromptsBreakdownSummary({ data, isLoading }: PromptsBreakdownSum
                                 <TableBody>
                                     {prompts.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={6} className="text-muted-foreground text-center">
+                                            <TableCell colSpan={7} className="text-muted-foreground text-center">
                                                 No prompts
                                             </TableCell>
                                         </TableRow>
@@ -137,6 +138,9 @@ export function PromptsBreakdownSummary({ data, isLoading }: PromptsBreakdownSum
                                                 </TableCell>
                                                 <TableCell className="text-muted-foreground text-sm max-w-[280px] truncate font-mono" title={p.value ?? ""}>
                                                     {p.value ?? "—"}
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground text-sm max-w-[140px] truncate" title={(p.cognos_class ?? p.cognosClass) ?? ""}>
+                                                    {(p.cognos_class ?? p.cognosClass) ?? "—"}
                                                 </TableCell>
                                                 <TableCell className="text-right tabular-nums">
                                                     {p.dashboards_containing_count ?? 0}

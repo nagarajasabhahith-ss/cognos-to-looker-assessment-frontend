@@ -1,8 +1,9 @@
 "use client";
 
 import { use, useState } from "react";
+import { pdf } from "@react-pdf/renderer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, FileText } from "lucide-react";
+import { Package, FileText, LayoutDashboard } from "lucide-react";
 import { useAssessment, useAssessmentObjects, useAssessmentReport } from "@/hooks/use-assessment";
 import { OverviewTab } from "@/components/assessment/overview-tab";
 import { ResultsTab } from "@/components/assessment/results-tab";
@@ -20,7 +21,12 @@ import { PromptsBreakdownSummary } from "@/components/assessment/prompts-breakdo
 import { QueriesBreakdownSummary } from "@/components/assessment/queries-breakdown-summary";
 import { MeasuresBreakdownSummary } from "@/components/assessment/measures-breakdown-summary";
 import { DimensionsBreakdownSummary } from "@/components/assessment/dimensions-breakdown-summary";
-import { MigrationAssessmentReport } from "@/components/assessment/migration-assessment-report";
+import { FullDetailsByDashboard } from "@/components/assessment/full-details-by-dashboard";
+import {
+    MigrationAssessmentReport,
+    buildReportPdfDataFromApi,
+} from "@/components/assessment/migration-assessment-report";
+import { AssessmentReportPdf } from "@/components/assessment/migration-assessment-report/AssessmentReportPdf";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AssessmentDetailsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -49,6 +55,39 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
 
     const [isRunning, setIsRunning] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
+    const [isExportingPdf, setIsExportingPdf] = useState(false);
+
+    const handleExportPdf = async () => {
+        setIsExportingPdf(true);
+        try {
+            const [freshReport, objectsResult] = await Promise.all([
+                refetchReport(),
+                refetchObjects(),
+            ]);
+            if (!freshReport || !assessment) {
+                return;
+            }
+            const objects = objectsResult?.objects ?? [];
+            const pdfData = buildReportPdfDataFromApi(
+                {
+                    assessmentName: assessment.name,
+                    biTool: assessment.bi_tool,
+                    createdAt: assessment.created_at,
+                },
+                freshReport,
+                objects
+            );
+            const blob = await pdf(<AssessmentReportPdf data={pdfData} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `migration-assessment-report-${(assessment.name ?? "assessment").replace(/[^a-zA-Z0-9]/g, "-")}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } finally {
+            setIsExportingPdf(false);
+        }
+    };
 
     const handleRunAnalysis = async () => {
         setIsRunning(true);
@@ -87,14 +126,17 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
                         <FileText className="mr-2 h-4 w-4" />
                         Migration Assessment Report
                     </TabsTrigger>
-                    <TabsTrigger value="inventory-summary" disabled={!hasResults}>
+                    {/* <TabsTrigger value="inventory-summary" disabled={!hasResults}>
                         <Package className="mr-2 h-4 w-4" />
                         Inventory Summary
                     </TabsTrigger>
                     <TabsTrigger value="results" disabled={!hasResults}>
                         Results & Visualization
                     </TabsTrigger>
-
+                    <TabsTrigger value="full-details-dashboard" disabled={!hasResults}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Full Details by Dashboard
+                    </TabsTrigger> */}
                 </TabsList>
 
                 <TabsContent value="overview">
@@ -110,11 +152,11 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
                     />
                 </TabsContent>
 
-                <TabsContent value="results">
+                {/* <TabsContent value="results">
                     {hasResults && <ResultsTab assessmentId={id} />}
-                </TabsContent>
+                </TabsContent> */}
 
-                <TabsContent value="inventory-summary">
+                {/* <TabsContent value="inventory-summary">
                     {hasResults && (
                         <div className="space-y-6">
                             {reportError && (
@@ -188,7 +230,31 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
                             />
                         </div>
                     )}
-                </TabsContent>
+                </TabsContent> */}
+
+                {/* <TabsContent value="full-details-dashboard">
+                    {hasResults && (
+                        <div className="space-y-6">
+                            {reportError && (
+                                <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 p-4 text-sm text-amber-800 dark:text-amber-200">
+                                    <p className="font-medium">Could not load report data</p>
+                                    <p className="mt-1">{reportError}</p>
+                                    <button
+                                        type="button"
+                                        onClick={() => refetchReport()}
+                                        className="mt-3 rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+                                    >
+                                        Retry
+                                    </button>
+                                </div>
+                            )}
+                            <FullDetailsByDashboard
+                                data={report?.full_details_by_dashboard ?? null}
+                                isLoading={isLoadingReport}
+                            />
+                        </div>
+                    )}
+                </TabsContent> */}
 
                 <TabsContent value="migration-report">
                     {hasResults && (
@@ -238,6 +304,8 @@ export default function AssessmentDetailsPage({ params }: { params: Promise<{ id
                                 assessmentName={assessment.name}
                                 biTool={assessment.bi_tool}
                                 createdAt={assessment.created_at}
+                                onExportPdf={handleExportPdf}
+                                isExportingPdf={isExportingPdf}
                             />
                         )
                     )}

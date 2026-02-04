@@ -21,10 +21,11 @@ export function ReportHeader({
         <div className="bg-[var(--deep-green)] text-white p-6 rounded-t-lg mb-0">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
-                        <div className="w-4 h-4 bg-[var(--deep-green)] rounded"></div>
-                    </div>
-                    <span className="text-lg font-semibold">SQUARESHIFT</span>
+                    <img
+                        src="/squareshift-logo-white.avif"
+                        alt="Squareshift"
+                        className="h-auto w-auto max-h-10 object-contain"
+                    />
                 </div>
                 <Button
                     className="bg-[var(--royal-gold)] text-[var(--deep-green)] hover:bg-[var(--royal-gold)] font-semibold rounded-md"

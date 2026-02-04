@@ -143,6 +143,9 @@ const COMPLEXITY_SECTION_CONFIG: Array<{
     { key: "query", title: "Query", featureAreaLabel: "Query", columns: [
         { header: "QUERIES", key: "query_count" }, { header: "DASHBOARDS AFFECTED", key: "dashboards_containing_count" }, { header: "REPORTS AFFECTED", key: "reports_containing_count" },
     ]},
+    { key: "data_module", title: "Data Module", featureAreaLabel: "Data Module", columns: [
+        { header: "DATA MODULES", key: "data_module_count" }, { header: "DASHBOARDS AFFECTED", key: "dashboards_containing_count" }, { header: "REPORTS AFFECTED", key: "reports_containing_count" },
+    ]},
 ];
 
 interface AssessmentReportPdfProps {
@@ -189,23 +192,21 @@ export function AssessmentReportPdf({ data }: AssessmentReportPdfProps) {
                     <Text style={styles.bodyText}>Overall Complexity: {overallComplexity}</Text>
                 )}
 
-                {summary?.key_findings && summary.key_findings.length > 0 && (
+                {summary?.overall_key_findings && summary.overall_key_findings.length > 0 && (
                     <>
-                        <Text style={styles.sectionSubtitle}>Key Findings</Text>
+                        <Text style={styles.sectionSubtitle}>Overall Key Findings</Text>
                         <PdfTable
                             headers={[
                                 { label: "AREA", flex: 1.2 },
-                                { label: "COMPLEXITY", flex: 0.8 },
-                                { label: "COUNT", flex: 0.5 },
+                                { label: "COMPLEXITY / IMPACT", flex: 0.8 },
                                 { label: "DASHBOARD", flex: 1 },
                                 { label: "REPORT", flex: 1 },
                             ]}
-                            rows={summary.key_findings.map((f) => [
+                            rows={summary.overall_key_findings.map((f) => [
                                 f.feature_area,
-                                f.complexity,
-                                f.count,
-                                f.dashboards_summary,
-                                f.reports_summary,
+                                f.complexity ?? "—",
+                                f.dashboards_summary ?? "—",
+                                f.reports_summary ?? "—",
                             ])}
                         />
                     </>

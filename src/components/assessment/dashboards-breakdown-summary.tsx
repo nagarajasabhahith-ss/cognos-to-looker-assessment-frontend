@@ -81,7 +81,7 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
                     )}
                 </div>
                 <CardDescription>
-                    Total dashboards: {total_dashboards}. Per-dashboard counts (visualizations, tabs, measures, dimensions, etc.).
+                    Total dashboards: {total_dashboards}. Per-dashboard counts (visualizations, tabs, measures, dimensions, sorts, prompts, parameters, etc.).
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -127,12 +127,15 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
                                         <TableHead className="text-right">Data modules</TableHead>
                                         <TableHead className="text-right">Packages</TableHead>
                                         <TableHead className="text-right">Data sources</TableHead>
+                                        <TableHead className="text-right">Sorts</TableHead>
+                                        <TableHead className="text-right">Prompts</TableHead>
+                                        <TableHead className="text-right">Parameters</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {dashboards.length === 0 ? (
                                         <TableRow>
-                                            <TableCell colSpan={12} className="text-muted-foreground text-center">
+                                            <TableCell colSpan={15} className="text-muted-foreground text-center">
                                                 No dashboard data
                                             </TableCell>
                                         </TableRow>
@@ -203,6 +206,9 @@ export function DashboardsBreakdownSummary({ data, isLoading }: DashboardsBreakd
                                                 <TableCell className="text-right">{d.total_data_modules ?? 0}</TableCell>
                                                 <TableCell className="text-right">{d.total_packages ?? 0}</TableCell>
                                                 <TableCell className="text-right">{d.total_data_sources ?? 0}</TableCell>
+                                                <TableCell className="text-right">{d.total_sorts ?? 0}</TableCell>
+                                                <TableCell className="text-right">{d.total_prompts ?? 0}</TableCell>
+                                                <TableCell className="text-right">{d.total_parameters ?? 0}</TableCell>
                                             </TableRow>
                                         ))
                                     )}

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { pdf } from "@react-pdf/renderer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { AssessmentReport, ExtractedObject } from "@/lib/api";
 import { useReportData } from "./useReportData";
 import { ReportHeader } from "./ReportHeader";
 import { SummaryTab } from "./SummaryTab";
@@ -32,12 +33,50 @@ function buildPdfData(data: ReturnType<typeof useReportData>): ReportPdfData {
     };
 }
 
+/** Build ReportPdfData from fresh API data (used when exporting PDF after refetch to avoid stale data). */
+export function buildReportPdfDataFromApi(
+    assessmentInfo: { assessmentName?: string; biTool?: string; createdAt?: string },
+    report: AssessmentReport,
+    objects: ExtractedObject[]
+): ReportPdfData {
+    const totalDashboards = objects.filter((o) => o.object_type === "dashboard").length;
+    const totalReports = objects.filter((o) => o.object_type === "report").length;
+    const formattedDate = assessmentInfo.createdAt
+        ? new Date(assessmentInfo.createdAt).toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+          })
+        : new Date().toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+          });
+    return {
+        formattedDate,
+        assessmentName: assessmentInfo.assessmentName ?? "Assessment",
+        biTool: assessmentInfo.biTool ?? "Cognos",
+        summary: report.summary ?? null,
+        complex_analysis: report.complex_analysis ?? null,
+        inventorySummary: { totalDashboards, totalReports },
+        overallComplexity: report.summary?.overall_complexity ?? "",
+        usage_stats: report.usage_stats ?? null,
+        challengesList: report.challenges?.visualization ?? [],
+        appendixDashboardsList: report.appendix?.dashboards ?? [],
+        appendixReportsList: report.appendix?.reports ?? [],
+    };
+}
+
 export function MigrationAssessmentReport(props: MigrationAssessmentReportProps) {
     const data = useReportData(props);
-    const [isExportingPdf, setIsExportingPdf] = useState(false);
+    const [internalExporting, setInternalExporting] = useState(false);
 
     const handleExportPdf = useCallback(async () => {
-        setIsExportingPdf(true);
+        setInternalExporting(true);
         try {
             const pdfData = buildPdfData(data);
             const blob = await pdf(<AssessmentReportPdf data={pdfData} />).toBlob();
@@ -48,9 +87,12 @@ export function MigrationAssessmentReport(props: MigrationAssessmentReportProps)
             a.click();
             URL.revokeObjectURL(url);
         } finally {
-            setIsExportingPdf(false);
+            setInternalExporting(false);
         }
     }, [data]);
+
+    const onExportPdf = props.onExportPdf ?? handleExportPdf;
+    const isExportingPdf = props.isExportingPdf ?? internalExporting;
 
     return (
         <div className="w-full">
@@ -58,7 +100,7 @@ export function MigrationAssessmentReport(props: MigrationAssessmentReportProps)
                 formattedDate={data.formattedDate}
                 assessmentName={data.assessmentName}
                 biTool={data.biTool}
-                onExportPdf={handleExportPdf}
+                onExportPdf={onExportPdf}
                 isExportingPdf={isExportingPdf}
             />
 

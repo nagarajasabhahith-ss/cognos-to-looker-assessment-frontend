@@ -85,9 +85,9 @@ export function useAssessmentObjects(id: string, enabled: boolean = true) {
     const [relationships, setRelationships] = useState<ObjectRelationship[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const fetchObjects = useCallback(async () => {
-        if (!enabled) return;
-        
+    const fetchObjects = useCallback(async (): Promise<{ objects: ExtractedObject[]; relationships: ObjectRelationship[] } | null> => {
+        if (!enabled) return null;
+
         setIsLoading(true);
         try {
             // Fetch all objects using pagination
@@ -100,25 +100,28 @@ export function useAssessmentObjects(id: string, enabled: boolean = true) {
                 const objectsRes = await assessmentApi.getObjects(id, { skip, limit });
                 const fetchedObjects = objectsRes.data;
                 allObjects.push(...fetchedObjects);
-                
+
                 if (fetchedObjects.length < limit) {
                     hasMore = false;
                 } else {
                     skip += limit;
                 }
             }
-            
+
             setObjects(allObjects);
 
-            // Fetch relationships
+            let allRelationships: ObjectRelationship[] = [];
             try {
                 const relationshipsRes = await assessmentApi.getRelationships(id, { limit: 5000 });
-                setRelationships(relationshipsRes.data);
+                allRelationships = relationshipsRes.data;
+                setRelationships(allRelationships);
             } catch (error) {
                 console.error("Failed to fetch relationships", error);
             }
+            return { objects: allObjects, relationships: allRelationships };
         } catch (error) {
             console.error("Failed to fetch objects", error);
+            return null;
         } finally {
             setIsLoading(false);
         }
@@ -143,14 +146,15 @@ export function useAssessmentReport(id: string, enabled: boolean = true) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchReport = useCallback(async () => {
-        if (!enabled) return;
+    const fetchReport = useCallback(async (): Promise<AssessmentReport | null> => {
+        if (!enabled) return null;
 
         setError(null);
         setIsLoading(true);
         try {
             const res = await assessmentApi.getReport(id);
             setReport(res.data);
+            return res.data;
         } catch (err: unknown) {
             const axiosErr = err as { code?: string; message?: string; response?: { status?: number }; config?: { baseURL?: string } };
             console.error("Failed to fetch report", err);
@@ -164,6 +168,7 @@ export function useAssessmentReport(id: string, enabled: boolean = true) {
             } else {
                 setError(axiosErr?.message ?? "Failed to load report.");
             }
+            return null;
         } finally {
             setIsLoading(false);
         }

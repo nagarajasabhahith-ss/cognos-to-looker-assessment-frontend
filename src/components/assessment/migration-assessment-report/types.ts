@@ -22,6 +22,10 @@ export interface MigrationAssessmentReportProps {
     assessmentName?: string;
     biTool?: string;
     createdAt?: string;
+    /** Optional: when provided, export uses this handler (e.g. refetch then build PDF) so PDF uses fresh data. */
+    onExportPdf?: () => void | Promise<void>;
+    /** Optional: when parent provides onExportPdf, pass loading state for the export button. */
+    isExportingPdf?: boolean;
 }
 
 export type PageNumber = number | "ellipsis";
